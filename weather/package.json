@@ -1,0 +1,19 @@
+{
+  "name": "weather",
+  "version": "1.0.0",
+  "description": "",
+  "main": "weather.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.7.0",
+    "xml2js": "^0.4.15",
+    "asyncawait": "^1.0.1",
+    "aws-sdk": "^2.2.19",
+    "lodash": "^3.10.1",
+    "es6-promise": "^3.0.2"
+  }
+}
