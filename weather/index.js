@@ -20,12 +20,14 @@ var xmlToJson = function(xml) {
         });
     });
 };
+exports.xmlToJson = xmlToJson;
 
 var getForecast = function(obj) {
     var tokyoArea = obj.weatherforecast.pref[0].area[3];
     assert (tokyoArea.$.id === "東京地方");
     return tokyoArea.info;
 };
+exports.getForecast = getForecast;
 
 var getTodaysRainFallChance = function(forecasts) {
     var today = new Date();
@@ -34,42 +36,78 @@ var getTodaysRainFallChance = function(forecasts) {
     //var ss = _.filter(forecasts, function(v){
     //    return todayStr == todayStr;
     //});
-    return forecasts[3].rainfallchance[0].period;
+    return forecasts[0].rainfallchance[0].period;
 };
+exports.getTodaysRainFallChance = getTodaysRainFallChance;
 
-var isTodayWillFallRain = function(periods) {
+var willFallRain = function(periods) {
     var ss = _.filter(periods, function(v){
         return Number(v._) >= 50;
     });
     return ss.length > 0;
 };
+exports.willFallRain = willFallRain;
 
-var format = function(periods) {
+var format = function(periods, obj) {
     var ss = _.map(periods, function(v){
         return v.$.hour + "時は" + v._ + "％";
     });
-    return _.reduce(ss, function(acc, v){
+    var s = _.reduce(ss, function(acc, v){
         return acc + "\n" + v;
     });
-};
 
-var weatherUrl = 'http://www.drk7.jp/weather/xml/13.xml';
+    var tokyoArea = obj.weatherforecast.pref[0].area[3];
+    var todayStr = tokyoArea.info[0].$.date;
+    return "今日(" + todayStr + ")は「" + tokyoArea.$.id　+ "」で雨が降りそうです。降水確率は、\n" + s;
+};
+exports.format = format;
+
+var getWeatherAPI = function() {
+    var weatherUrl = 'http://www.drk7.jp/weather/xml/13.xml';
+    return axios({
+        method: 'get',
+        url: weatherUrl
+    });
+};
+exports.getWeatherAPI = getWeatherAPI;
+
+var sendToSlack = function(text) {
+    var slackUrl = 'https://hooks.slack.com/services/XXX/XXX/XXX';//set your slack API
+    return axios({
+        method: 'post',
+        url: slackUrl,
+        data: {
+            text: text,
+            "username": "slackbot",
+            "icon_emoji": ":slackbot:",
+            "channel": "#bot"
+        },
+        headers: {'Content-Type': 'application/json'}
+    });
+};
+exports.sendToSlack = sendToSlack;
 
 
 var func = async (function () {
-    var res = await(axios.get(weatherUrl, {}));
+    var res = await(getWeatherAPI());
+    console.log("res");
     console.log(res);
     var obj = await(xmlToJson(res.data));
+    console.log("obj");
     console.log(obj);
     var forecasts = getForecast(obj);
+    console.log("forecasts");
     console.log(forecasts);
     var rainFallChances = getTodaysRainFallChance(forecasts);
+    console.log("rainFallChances");
     console.log(rainFallChances);
-    if(isTodayWillFallRain(rainFallChances)){
-        var text = format(rainFallChances);
-        return "今日は雨が降りそうです。降水確率は、\n" + text;
+    if(willFallRain(rainFallChances)){
+        var text = format(rainFallChances, obj);
+        console.log("text");
+        console.log(text);
+        return sendToSlack(text);
     }else{
-        return null;
+        return Promise.resolve("no rain");
     }
 });
 
@@ -80,14 +118,9 @@ exports.handler = function(event, context) {
     };
 
     var onFailure = function(value) {
-        context.error(value);
+        console.log("fail");
+        console.log(value);
+        context.fail(value);
     };
     func().then(onSuccess).catch(onFailure);
 };
-
-
-//var onSuccess = function(value) {
-//    console.log(value);
-//};
-//
-//var text = func().then(onSuccess);
