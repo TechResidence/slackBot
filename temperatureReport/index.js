@@ -29,39 +29,6 @@ var getForecast = function(obj) {
 };
 exports.getForecast = getForecast;
 
-var getTodaysRainFallChance = function(forecasts) {
-    var today = new Date();
-    today.setHours(today.getHours() + 9);
-    var todayStr = today.getFullYear() + "/" + (today.getMonth() + 1) + "/" + today.getDate();
-    //var ss = _.filter(forecasts, function(v){
-    //    return todayStr == todayStr;
-    //});
-    return forecasts[0].rainfallchance[0].period;
-};
-exports.getTodaysRainFallChance = getTodaysRainFallChance;
-
-var willFallRain = function(periods) {
-    var ss = _.filter(periods, function(v){
-        return Number(v._) >= 50;
-    });
-    return ss.length > 0;
-};
-exports.willFallRain = willFallRain;
-
-var format = function(periods, obj) {
-    var ss = _.map(periods, function(v){
-        return v.$.hour + "時は" + v._ + "％";
-    });
-    var s = _.reduce(ss, function(acc, v){
-        return acc + "\n" + v;
-    });
-
-    var tokyoArea = obj.weatherforecast.pref[0].area[3];
-    var todayStr = tokyoArea.info[0].$.date;
-    return "今日(" + todayStr + ")は「" + tokyoArea.$.id　+ "」で雨が降りそうです。降水確率は、\n" + s;
-};
-exports.format = format;
-
 var getWeatherAPI = function() {
     var weatherUrl = 'http://www.drk7.jp/weather/xml/13.xml';
     return axios({
@@ -72,7 +39,7 @@ var getWeatherAPI = function() {
 exports.getWeatherAPI = getWeatherAPI;
 
 var sendToSlack = function(text) {
-    var slackUrl = 'https://hooks.slack.com/services/XXX/XXX/XXX';//set your slack API
+    var slackUrl = 'https://hooks.slack.com/services/XXX';//set your slack API
     return axios({
         method: 'post',
         url: slackUrl,
@@ -98,16 +65,19 @@ var func = async (function () {
     var forecasts = getForecast(obj);
     console.log("forecasts");
     console.log(forecasts);
-    var rainFallChances = getTodaysRainFallChance(forecasts);
-    console.log("rainFallChances");
-    console.log(rainFallChances);
-    if(willFallRain(rainFallChances)){
-        var text = format(rainFallChances, obj);
-        console.log("text");
-        console.log(text);
-        return sendToSlack(text);
+
+    var yesterdayMaxTemp = forecasts[0].temperature[0].range[0]._;
+    console.log(yesterdayMaxTemp);
+    var todayMaxTemp = forecasts[1].temperature[0].range[0]._;
+    console.log(todayMaxTemp);
+    var diff = todayMaxTemp - yesterdayMaxTemp;
+    console.log(diff);
+    if(diff > 5){
+        return sendToSlack("今日は、昨日より " + diff + "度 高いので暑いです");
+    }else if(diff < -5){
+        return sendToSlack("今日は、昨日より " + Math.abs(diff) + "度 低いので寒いです");
     }else{
-        return Promise.resolve("no rain");
+        return Promise.resolve("no diff");
     }
 });
 

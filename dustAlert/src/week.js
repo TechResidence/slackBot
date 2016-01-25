@@ -49,7 +49,7 @@ var calcText = function(date){
         date.setDate( date.getDate() + 1 );
         var dateNum = date.getDate();
         if(1 <= dateNum && dateNum <= 7) {//Tue
-            return "明日 ハ 「不燃ゴミ」 ノ 日デス"
+            return "明日 ハ 月ニ 一度 ノ 「不燃ゴミ」 ノ 日デス\n▒▒▓█▇▅▂∩( ✧Д✧)∩ファイアー▂▅▇█▓▒▒"
         }
     }
     return null;
