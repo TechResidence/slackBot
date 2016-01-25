@@ -1,5 +1,3 @@
-
-
 exports.handler = function(event, context) {
     console.log(event);
     if(event.text === "<@USLACKBOT>: じゃあ俺がやるよ"){
@@ -12,12 +10,25 @@ exports.handler = function(event, context) {
             "username": "slackbot2",
             "icon_emoji": ":robot_face:"
         });
-    }else if(event.text === "<@USLACKBOT>: じゃぁ俺が"){
+    }else if(event.text === "<@USLACKBOT>: いや、俺がやるよ"){
+        context.done(null, {text: "<@USLACKBOT>: そんなそんな、私がやりますよ。",
+            "username": "bot_ko",
+            "icon_emoji": ":shibata_ko:"
+        });
+    }else if(event.text === "<@USLACKBOT>: じゃあ"){
          context.done(null, {text: "<@USLACKBOT>: どうぞどうぞ",
              "username": "slackbot",
              "icon_emoji": ":slackbot:"
          });
-    }else{
-        context.done(null, {text: "<@USLACKBOT>: じゃあ俺がやるよ"});
+    }else if(event.text === "<@USLACKBOT>: どうぞどうぞ"){
+         context.done(null, {text: "<@USLACKBOT>: どうぞどうぞ！",
+            "username": "slackbot2",
+            "icon_emoji": ":robot_face:"
+         });
+    }else if(event.text === "<@USLACKBOT>: どうぞどうぞ！"){
+         context.done(null, {text: "<@USLACKBOT>: どうぞどうぞどうぞ",
+            "username": "bot_ko",
+            "icon_emoji": ":shibata_ko:"
+         });
     }
 };
