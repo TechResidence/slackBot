@@ -6,7 +6,7 @@ var postJson = function(obj, succCB, failCB) {
     var options = {
         hostname: 'hooks.slack.com',
         port: 443,
-        path: '/services/XXX/XXX/XXX', //set your webhook url.
+        path: '/services/XXX',
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -39,17 +39,17 @@ var calcText = function(date){
     console.log(date);
     var weekNum = date.getDay();
     if(weekNum === 1){//Mon
-        return "明日 ハ 「可燃ゴミ」 ノ 日デス"
+        return "今日 ハ 「可燃ゴミ」 ノ 日デス"
     }else if(weekNum === 3){//Wed
-        return "明日 ハ 「資源ゴミ」 ノ 日デス"
+        return "今日 ハ 「資源ゴミ」 ノ 日デス"
     }else if(weekNum === 4){//Thu
-        return "明日 ハ 「可燃ゴミ」 ノ 日デス"
+        return "今日 ハ 「可燃ゴミ」 ノ 日デス"
     }
     if(weekNum === 2){//Tue
         date.setDate( date.getDate() + 1 );
         var dateNum = date.getDate();
         if(1 <= dateNum && dateNum <= 7) {//Tue
-            return "明日 ハ 月ニ 一度 ノ 「不燃ゴミ」 ノ 日デス\n▒▒▓█▇▅▂∩( ✧Д✧)∩ファイアー▂▅▇█▓▒▒"
+            return "今日 ハ 月ニ 一度 ノ 「不燃ゴミ」 ノ 日デス\n▒▒▓█▇▅▂∩( ✧Д✧)∩ファイアー▂▅▇█▓▒▒"
         }
     }
     return null;
@@ -73,7 +73,12 @@ exports.handler = function(event, context) {
 
     var text = calcText(date);
     if(text){
-        postJson({'text': text}, onSuccess, onFailure);
+        postJson({
+            'text': text,
+            "icon_emoji": ":slackbot:",
+            "username": "slackbot",
+            "channel": "#bot"
+        }, onSuccess, onFailure);
     }else{
         context.done(null, 'a very merry unbirthday to you');
     }

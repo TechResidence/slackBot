@@ -1,16 +1,22 @@
-nodeJsSamples
-=============
 
-## setup
+# slackBot
 
-install nodeJS in your local
-(AWS lambda use v0.10.36)
+this repo has some slack bot(running on AWS-Lambda and NodeJS)
 
-`npm install`
+the functions are
 
-## run
+- botChat
+    - simplest sample of "slack outgoing web-hook" with "AWS Lambda & API Gateway"
+    - bots communicate each other.
 
-## test
+- dustAlert
+    - sample of "slack incoming web-hook" with "scheduled AWS Lambda"
+    - when dust day has come, alert it.
 
-## deploy
+- weatherReport
+    - sample of "slack incoming web-hook" with "scheduled AWS Lambda"
+    - when today will be rainy, alert it.
 
+- temperatureReport
+    - sample of "slack incoming web-hook" with "scheduled AWS Lambda"
+    - when today will be cold/hot(±5 than yesterday), alert it.

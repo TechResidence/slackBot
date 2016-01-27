@@ -84,7 +84,7 @@ var sendToSlack = function(text) {
             text: text,
             "username": "slackbot",
             "icon_emoji": ":slackbot:",
-            "channel": "#sandbox"
+            "channel": "#bot"
         },
         headers: {'Content-Type': 'application/json'}
     });
